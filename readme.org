@@ -1,0 +1,124 @@
+#+title: Readme
+
+Seems slightly related to [[https://github.com/lambdaisland/ornament/issues/2][this]] but this in this repro it's the ~clojure.core/str~ symbol that isn't resolved.
+
+I've tried some amount of combinations of dependency versions including the exact versions I've used in the past. However, I've also just realised that we were using HTMX so everything was CLJ.
+
+I've updated the component to use:
+
+#+begin_src clojure
+#?(:cljs cljs.core/str
+   :clj clojure.core/str)
+#+end_src
+
+...and the error goes away.
+
+### Steps
+
+- Clone the repo
+- Run ~npm i~
+- Run ~npx shadow-cljs watch app~
+- You should see an error like the following:
+#+begin_src sh
+ornament-eval-repro on  main [?] took 5m 14s
+❯ npx shadow-cljs watch app
+shadow-cljs - config: /Users/donavan/src/ornament-eval-repro/shadow-cljs.edn
+shadow-cljs - starting via "clojure"
+shadow-cljs - server version: 2.20.20 running at http://localhost:9630
+shadow-cljs - nREPL server started on port 8777
+shadow-cljs - watching build :app
+[:app] Configuring build.
+[:app] Compiling ...
+WARNING: abs already refers to: #'clojure.core/abs in namespace: garden.color, being replaced by: #'garden.color/abs
+[:app] Build failure:
+------ ERROR -------------------------------------------------------------------
+ File: /Users/donavan/src/ornament-eval-repro/src/repro.cljc:10:1
+--------------------------------------------------------------------------------
+   7 |   []
+   8 |   (prn 'init))
+   9 |
+  10 | (defstyled component :div
+-------^------------------------------------------------------------------------
+Encountered error when macroexpanding lambdaisland.ornament/defstyled.
+Error in phase :compile-syntax-check
+RuntimeException: Unable to resolve symbol: str in this context
+	clojure.lang.Util.runtimeException (Util.java:221)
+	clojure.lang.Compiler.resolveIn (Compiler.java:7431)
+	clojure.lang.Compiler.resolve (Compiler.java:7375)
+	clojure.lang.Compiler.analyzeSymbol (Compiler.java:7336)
+	clojure.lang.Compiler.analyze (Compiler.java:6785)
+	clojure.lang.Compiler.analyze (Compiler.java:6762)
+	clojure.lang.Compiler$InvokeExpr.parse (Compiler.java:3832)
+	clojure.lang.Compiler.analyzeSeq (Compiler.java:7126)
+	clojure.lang.Compiler.analyze (Compiler.java:6806)
+	clojure.lang.Compiler.analyze (Compiler.java:6762)
+	clojure.lang.Compiler$MapExpr.parse (Compiler.java:3116)
+	clojure.lang.Compiler.analyze (Compiler.java:6814)
+	clojure.lang.Compiler.analyze (Compiler.java:6762)
+	clojure.lang.Compiler$VectorExpr.parse (Compiler.java:3272)
+	clojure.lang.Compiler.analyze (Compiler.java:6808)
+	clojure.lang.Compiler.analyze (Compiler.java:6762)
+	clojure.lang.Compiler$BodyExpr$Parser.parse (Compiler.java:6137)
+	clojure.lang.Compiler$FnMethod.parse (Compiler.java:5479)
+	clojure.lang.Compiler$FnExpr.parse (Compiler.java:4041)
+	clojure.lang.Compiler.analyzeSeq (Compiler.java:7122)
+	clojure.lang.Compiler.analyze (Compiler.java:6806)
+	clojure.lang.Compiler.eval (Compiler.java:7191)
+	clojure.lang.Compiler.eval (Compiler.java:7184)
+	clojure.lang.Compiler.eval (Compiler.java:7149)
+	clojure.core/eval (core.clj:3215)
+	clojure.core/eval (core.clj:3211)
+	lambdaisland.ornament/defstyled (ornament.cljc:611)
+	lambdaisland.ornament/defstyled (ornament.cljc:563)
+	clojure.core/apply (core.clj:671)
+	clojure.core/apply (core.clj:662)
+	cljs.analyzer/macroexpand-1*/fn--3704 (analyzer.cljc:4025)
+	cljs.analyzer/macroexpand-1* (analyzer.cljc:4023)
+	cljs.analyzer/macroexpand-1* (analyzer.cljc:4010)
+	cljs.analyzer/macroexpand-1 (analyzer.cljc:4074)
+	cljs.analyzer/macroexpand-1 (analyzer.cljc:4070)
+	cljs.analyzer/analyze-seq (analyzer.cljc:4107)
+	cljs.analyzer/analyze-seq (analyzer.cljc:4087)
+	cljs.analyzer/analyze-form (analyzer.cljc:4296)
+	cljs.analyzer/analyze-form (analyzer.cljc:4293)
+	cljs.analyzer/analyze* (analyzer.cljc:4349)
+	cljs.analyzer/analyze* (analyzer.cljc:4341)
+	shadow.build.compiler/analyze/fn--15097 (compiler.clj:264)
+	shadow.build.compiler/analyze (compiler.clj:252)
+	shadow.build.compiler/analyze (compiler.clj:211)
+	shadow.build.compiler/analyze (compiler.clj:213)
+	shadow.build.compiler/analyze (compiler.clj:211)
+	shadow.build.compiler/default-analyze-cljs (compiler.clj:415)
+	shadow.build.compiler/default-analyze-cljs (compiler.clj:404)
+	clojure.core/partial/fn--5908 (core.clj:2642)
+	shadow.build.compiler/do-analyze-cljs-string (compiler.clj:321)
+	shadow.build.compiler/do-analyze-cljs-string (compiler.clj:278)
+	shadow.build.compiler/analyze-cljs-string/fn--15192 (compiler.clj:518)
+	shadow.build.compiler/analyze-cljs-string (compiler.clj:517)
+	shadow.build.compiler/analyze-cljs-string (compiler.clj:515)
+	shadow.build.compiler/do-compile-cljs-resource/fn--15220 (compiler.clj:637)
+	shadow.build.compiler/do-compile-cljs-resource (compiler.clj:618)
+	shadow.build.compiler/do-compile-cljs-resource (compiler.clj:572)
+	shadow.build.compiler/maybe-compile-cljs/fn--15324 (compiler.clj:969)
+	shadow.build.compiler/maybe-compile-cljs (compiler.clj:968)
+	shadow.build.compiler/maybe-compile-cljs (compiler.clj:944)
+	shadow.build.compiler/par-compile-one (compiler.clj:1089)
+	shadow.build.compiler/par-compile-one (compiler.clj:1044)
+	shadow.build.compiler/par-compile-cljs-sources/fn--15364/iter--15386--15390/fn--15391/fn--15392/fn--15393 (compiler.clj:1162)
+	clojure.core/apply (core.clj:667)
+	clojure.core/with-bindings* (core.clj:1990)
+	clojure.core/with-bindings* (core.clj:1990)
+	clojure.core/apply (core.clj:671)
+	clojure.core/bound-fn*/fn--5818 (core.clj:2020)
+	java.util.concurrent.FutureTask.run (FutureTask.java:264)
+	java.util.concurrent.ThreadPoolExecutor.runWorker (ThreadPoolExecutor.java:1128)
+	java.util.concurrent.ThreadPoolExecutor$Worker.run (ThreadPoolExecutor.java:628)
+	java.lang.Thread.run (Thread.java:829)
+
+--------------------------------------------------------------------------------
+  11 |   {:border (str "1px solid red")}
+  12 |   ([props]
+  13 |    [:<> "foo"]))
+  14 |
+--------------------------------------------------------------------------------
+#+end_src

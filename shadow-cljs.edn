@@ -1,0 +1,8 @@
+{:deps true
+ :nrepl {:port 8777}
+ :builds
+ {:app
+  {:target :browser
+   :output-dir "ext"
+   :modules {:app {:init-fn repro/init}}
+   :asset-path "/"}}}
